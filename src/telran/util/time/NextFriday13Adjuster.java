@@ -48,9 +48,12 @@ public class NextFriday13Adjuster implements TemporalAdjuster {
 	@Override
 	public Temporal adjustInto(Temporal temporal) {
 			
-			while((temporal.get(ChronoField.DAY_OF_MONTH) != 13)||
-				( DayOfWeek.of(temporal.get(ChronoField.DAY_OF_WEEK)) != DayOfWeek.FRIDAY))	temporal = temporal.plus(1, ChronoUnit.DAYS);
-
+	//		while((temporal.get(ChronoField.DAY_OF_MONTH) != 13)||
+	//			( DayOfWeek.of(temporal.get(ChronoField.DAY_OF_WEEK)) != DayOfWeek.FRIDAY))	temporal = temporal.plus(1, ChronoUnit.DAYS);
+			
+		// temporal.get(ChronoField.DAY_OF_WEEK) - integer Monday=1, Friday=5!!!!!!
+		while((temporal.get(ChronoField.DAY_OF_MONTH) != 13)||
+					((temporal.get(ChronoField.DAY_OF_WEEK)) != 5))	temporal = temporal.plus(1, ChronoUnit.DAYS);
 		return temporal;
 		}
 	
