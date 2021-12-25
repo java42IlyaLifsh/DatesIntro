@@ -10,11 +10,11 @@ import java.time.temporal.TemporalAdjuster;
 
 public class NextFriday13Adjuster implements TemporalAdjuster {
 	private static final int DAY13=13;
-	
-	@Override
+
 	
 /*	
  // VARIANT 1, watched at the webinar, on a million repetitions it works 4 seconds
+	@Override
 	public Temporal adjustInto(Temporal temporal) {
 		temporal=getNearest13Day(temporal);
 		while(DayOfWeek.from(temporal) != DayOfWeek.FRIDAY){
@@ -31,14 +31,27 @@ public class NextFriday13Adjuster implements TemporalAdjuster {
 		return temporal;
 	}
 */
-
- // VARIANT 2, I wrote it with a minimum of methods, 7 seconds work on a million repetitions
+	
+/*
+ // VARIANT 2, I wrote it with a minimum of methods and without methods for TEMPORAL, 7 seconds work on a million repetitions
+		@Override
 	public Temporal adjustInto(Temporal temporal) {
-		LocalDate date = LocalDate.from(temporal);
+//		LocalDate date = LocalDate.from(temporal);
+		LocalDate date = (LocalDate) temporal;
 		while ((date.getDayOfMonth() != DAY13) ||
 		(date.getDayOfWeek() != DayOfWeek.FRIDAY)) date=date.plusDays(1);
 	return temporal.with(date);
 	}
+*/
+	
+	 // VARIANT 3, I wrote it with a minimum of methods for TEMPORAL, 10 seconds work on a million repetitions
+	@Override
+	public Temporal adjustInto(Temporal temporal) {
+			
+			while((temporal.get(ChronoField.DAY_OF_MONTH) != 13)||
+				( DayOfWeek.of(temporal.get(ChronoField.DAY_OF_WEEK)) != DayOfWeek.FRIDAY))	temporal = temporal.plus(1, ChronoUnit.DAYS);
 
-
+		return temporal;
+		}
+	
 }
