@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +35,7 @@ class DateTimeTests {
 	@Test
 	void testNextFriday13Adjuster() {
 		assertEquals(LocalDate.parse("2022-05-13"), LocalDate.parse("2021-12-22").with(new NextFriday13Adjuster()));
+		assertEquals(LocalDate.parse("2023-01-13"), LocalDate.parse("2022-05-13").with(new NextFriday13Adjuster()));
 	}
 	@Test
 	void testGetAge() {
@@ -46,8 +48,9 @@ class DateTimeTests {
 	}
 
 	private int getAgeAtDate(LocalDate birthDate, LocalDate atDate) {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		
+		return (int)ChronoUnit.YEARS.between(birthDate, atDate);
 	}
 	
 
