@@ -25,7 +25,7 @@ private static Locale locale = Locale.forLanguageTag("en");
 //		System.out.println(op1 + op2);
 		/************************************************/
 		try {
-			
+			// OK
 		if(args.length>0 && args[0].equals("-h")) {
 			printHelp();
 			return;
@@ -85,7 +85,8 @@ private static Locale locale = Locale.forLanguageTag("en");
 
 	
 	
-	private static void setDaysOfWeek(int firstDayOfWeek) {
+	// OK
+	private static void setDaysOfWeek(int firstDayOfWeek) {  
 		
 		if(firstDayOfWeek > 1) {
 
