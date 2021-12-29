@@ -1,12 +1,15 @@
 package telran.application.dates;
 //HW_24 IlyaL
+
 import java.time.*;
 import java.time.format.TextStyle;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class PrintCalendar {
 private static final TextStyle WEEK_DAY_LENGTH = TextStyle.SHORT_STANDALONE;
-static  DayOfWeek[] daysOfWeek;
+static  DayOfWeek[] daysOfWeek = DayOfWeek.values();
 private static Locale locale = Locale.forLanguageTag("en");
 
 	public static void main(String[] args) {
@@ -23,28 +26,79 @@ private static Locale locale = Locale.forLanguageTag("en");
 		/************************************************/
 		try {
 			
-		
-		//TODO Part for arguments processing
+		if(args.length>0 && args[0].equals("-h")) {
+			printHelp();
+			return;
+		}
+		int month=getMonth(args);
+		int year=getYear(args);
+		int firstDayOfWeek=getFirstDayOfWeek(args);
+		//Part for arguments processing
 		//java -jar <jar file name> <month number> <year> <full name of week day (SUNDAY upper case)>
 		//no arguments - current month, current year, MONDAY
 		//no year, no week day - current year, MONDAY
 		//no week day - MONDAY
-		setDaysOfWeek(args);
-		} catch(Exception e) {
-			System.out.println(e.getMessage());
-		}
-		printCalendar(12, 2021);
 
-	}
-
-	private static void setDaysOfWeek(String[] args) throws Exception{
-		if (args.length > 2) {
-			//TODO reordering of static field daysOfWeek 
-			//in the case of wrong week day exception should be thrown
-		} else {
-			daysOfWeek = DayOfWeek.values();
+		
+		setDaysOfWeek(firstDayOfWeek);
+		printCalendar(month, year);
+		
+		} catch (NumberFormatException ex) {
+			System.out.println("NumberFormatException: " + ex.getMessage() + getInputString(args));
+			printHelp();
+		} catch (IllegalArgumentException ex) {
+			System.out.println("IllegalArgumentException: " + ex.getMessage() + getInputString(args));
+			printHelp();
+		} catch (DateTimeException ex) {
+			System.out.println("DateTimeException: " + ex.getMessage() + getInputString(args)); 
+			printHelp();
 		}
 		
+
+	}
+	
+	private static void printHelp() {
+		System.out.println("\nInput Format:\nM: 1-12, Y: 0-5000, DayName: Monday-Sunday");		
+	}
+	
+	
+	private static String getInputString(String[] args) {
+			String inputString = "\nInput: ";
+			for(String arg : args) {
+				inputString += arg + " ";
+			}
+			return inputString;
+		}
+		
+	private static int getMonth(String[] args) throws NumberFormatException {
+			return args.length > 0 ? Integer.parseInt(args[0]) : LocalDate.now().getMonthValue();
+		}
+		 
+	private static int getYear(String[] args) throws NumberFormatException {
+			return args.length > 1 ? Integer.parseInt(args[1]) : LocalDate.now().getYear();
+		}
+		 
+	private static int getFirstDayOfWeek(String[] args) throws IllegalArgumentException {
+			return args.length > 2 ? DayOfWeek.valueOf(args[2].toUpperCase()).getValue() : 1;
+		}
+		
+
+	
+	
+	private static void setDaysOfWeek(int firstDayOfWeek) {
+		
+		if(firstDayOfWeek > 1) {
+
+			List<DayOfWeek> tmpList = new ArrayList<>();
+			int index = firstDayOfWeek - 1;
+			for(DayOfWeek day : daysOfWeek) {
+				if(index == daysOfWeek.length) {
+					index = 0;
+				}
+				tmpList.add(daysOfWeek[index++]);
+			}
+			tmpList.toArray(daysOfWeek);
+		} 
 	}
 
 	private static void printCalendar(int month, int year) {
