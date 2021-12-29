@@ -8,7 +8,6 @@ public class PrintCalendar {
 	private static final TextStyle WEEK_DAY_LENGTH = TextStyle.SHORT_STANDALONE;
 	static DayOfWeek[] daysOfWeek;
 	private static Locale locale = Locale.forLanguageTag("en");
-
 	public static void main(String[] args) {
 		/*****************************************/
 		int[] monthYear = null;
