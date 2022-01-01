@@ -1,54 +1,140 @@
 package telran.application.dates;
+//HW_25_IlyaL 2
 
+import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 
-//HW_25_IlyaL 1
 public class ReminderAppl {
 
+	private static Instant instantStart;
+	private static Instant instantFinish;
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		//args[0] - mandatory interval of beeps 
 		//args[1] - mandatory ChronoUnit (according to time units of ChronoUnit)
 		//args[2] - optional in ChronoUnit values when to end up beeps (default) 1 hour
 		//args[3] - optional in ChronoUnit values when to start beeping (default immediately )
-		//beep - System.out.println("\007")
-		int start = getStart(args);
-		int stop = getStop(args);
-		int interv = getInterv(args);
-		Instant instant = Instant.now();
-		LocalDateTime ltd = LocalDateTime.ofInstant(instant,ZoneId.systemDefault());
-		long intl=interv;
-		waitingFor(intl);
-		
-		
+		//beep - System.out.println("\007")   2 seconds 30 2
+		try {
+			int beepInterval = getBeepInterval(args);
+			ChronoUnit chronoUnit = getChronoUnit(args);
+			System.out.println("interval="+beepInterval+"  unit="+chronoUnit.toString());
+			int values[] = getOptionalParams(args);
+			System.out.println("end="+values[0]+"   start="+values[1]);
+			updateInstants(values, chronoUnit);
+			beeper(beepInterval, chronoUnit);
+		} catch (RuntimeException e) {
+			e.printStackTrace();                  //functionality error
+		} catch(Exception ex) {
+			System.out.println(ex.getMessage());  //wrong input data 
+		}
 
 	}
-	private static int getInterv(String[] args) {
-		return Integer.parseInt(args[2]);
+	private static void updateInstants(int values[], ChronoUnit chronoUnit) {
+		Instant instantCurrent = Instant.now();
+		instantStart = instantCurrent.plus(values[1], chronoUnit);
+		if(values[0] < 0) {
+			instantFinish = instantStart.plus(1, ChronoUnit.HOURS); 
+		} else {
+			instantFinish = instantStart.plus(values[0], chronoUnit);
+		}
 	}
-	private static int getStop(String[] args) {
-		return Integer.parseInt(args[1]);
+	private static int[] getOptionalParams(String[] args) throws Exception {
+		int res[] = new int[2];
+		if(args.length<3) {
+			res[0] = -1;
+			res[1] = 0;
+			return res;
+		}
+		try {
+			res[0] = Integer.parseInt(args[2]);
+			if(res[0] <= 0) {
+				throw new Exception("value to end up beeps has to be positive. Not "+args[2]);
+			}
+		} catch(NumberFormatException ex) {
+			throw new Exception("value to end up beeps has to be number. Not "+args[2]);
+		}
+		if(args.length == 3) {
+			res[1] = 0;
+			return res;
+		}
+		try {
+			res[1] = Integer.parseInt(args[3]);
+			if(res[1] <= 0) {
+				throw new Exception("value to start beeping has to be positive. Not "+args[3]);
+			}
+		} catch(NumberFormatException ex) {
+			throw new Exception("value to start beeping has to be number. Not "+args[3]);
+		}
+		return res;
 	}
-	private static int getStart(String[] args) {
-		return Integer.parseInt(args[0]);
+	private static ChronoUnit getChronoUnit(String[] args) throws Exception {
+		// Auto-generated method stub
+		if(args.length<2) {
+			throw new Exception("ChronoUnit is mandatory");
+		}
+		try {
+			return ChronoUnit.valueOf(args[1].toUpperCase());
+		} catch(IllegalArgumentException ex) {
+			throw new Exception("incorrect the name of ChronoUnit: "+ args[1]);
+		}
 	}
-	
+	private static int getBeepInterval(String[] args) throws Exception {
+		if(args.length<1) {
+			throw new Exception("interval of beep is mandatory");
+		}
+		try {
+			int result = Integer.parseInt(args[0].toUpperCase());
+			if(result <= 0) {
+				throw new Exception("Beep Interval should be positive, not " + args[0]);
+			}
+			return result;
+		} catch(NumberFormatException ex) {
+			throw new Exception("Beep Interval should be a number, not " + args[0]);
+		}
+	}
 	/**
 	 * waiting for the given time period in milliseconds
 	 * @param periodInMillis
 	 */
+	/*
 	static void waitingFor(long periodInMillis) {
-		//TODO
+		//
 		//do/while cycle with using Instant objects and method ChronoUnit between
-		Instant instant1 = Instant.now();
-		LocalDateTime ltd1 = LocalDateTime.ofInstant(instant1,ZoneId.systemDefault());
-		
-	do {System.out.println("\007");
-		
-	} while( (Instant.now().toEpochMilli()-instant1.toEpochMilli())<periodInMillis  );
-	
+		long amount = 0;
+		System.out.println("Before" + Instant.now());
+		Instant instant = Instant.now();
+		do {
+			amount = ChronoUnit.MILLIS.between(instant, Instant.now());
+		} while(amount < periodInMillis);
+		System.out.println("After" + Instant.now());
+		System.out.println("\007");
+	}
+	*/
+	private static void beeper(int beepInterval, ChronoUnit unit) {
+		System.out.println("BEGIN     " + Instant.now().toString());
+		// waiting of the start
+		while (Duration.between(instantStart, Instant.now()).toMillis()<0) {
+		//while(instantStart.isAfter(Instant.now())) {
+			
+		}
+		System.out.println("START     " + Instant.now().toString());
+		// The start of the process and waiting of the finish
+		while(Duration.between(instantFinish, Instant.now()).toMillis()<0) {
+		//while(instantFinish.isAfter(Instant.now())) {
+			Instant instanceBeeper = Instant.now().plus(beepInterval, unit);
+			// waiting of the beep
+			while (Duration.between(instanceBeeper, Instant.now()).toMillis()<0) {
+			//while(instanceBeeper.isAfter(Instant.now())) {
+				
+			}
+			System.out.println("BE-E-E-EP " + Instant.now().toString());
+			System.out.println("\007");
+		}
+		// The finish of whole process
+		System.out.println("FINISH    " + Instant.now().toString());
 	}
 
 }

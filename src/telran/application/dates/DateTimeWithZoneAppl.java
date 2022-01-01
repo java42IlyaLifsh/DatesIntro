@@ -1,60 +1,75 @@
 package telran.application.dates;
-
-import java.time.LocalDate;
+//HW_25_IlyaL 2
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-//HW_25_IlyaL 1
 public class DateTimeWithZoneAppl {
-public static void main(String[] args) {
+
+	static List<ZonedDateTime> timeZones = new ArrayList<>();
+	
+	public static void main(String[] args) {
 	//args[0] - optional substring of time Zone (default - local time zone)
-	//TODO display out the time in the appropriate ZoneId
-String timeZone="GMT+8";
-try {
-	timeZone=getTimeZone(args).toString();
-	System.out.println("1111  "+timeZone);
-} catch (RuntimeException e) {
-	e.printStackTrace();//functionality error
-}
-catch (Exception e) {
-	System.out.println(e.getMessage());//wrong input data 
-	return;
-}
-System.out.println("22222  "+timeZone);
-
-
-}
-
-private static ZoneId getTimeZone(String[] args) throws Exception {
-	// TODO Auto-generated method stub
-	ZoneId rezZone= ZoneId.systemDefault();
-	if (args.length > 1) {
-		String city = getCity(args[1]);
+	// display out the time in the appropriate ZoneId
+	
+	//1 получить данные
+	//2 проверить их на корректность и если нет распечатать хелп
+	//3 трай кетч, в трае получить время в запрашиваемых зонах
+	//3 распечатать полученные результаты
+	//4 обработать рантайм эксепшн, распечатав стек ошибки функциональности
+	//5 обработать чекэксепшн, распечатав сообщение и неверные данные на вводе.
 		
-		ZonedDateTime ztd = ZonedDateTime.now();
-		for(String zone: ZoneId.getAvailableZoneIds()) {
 			
-			if (zone.toLowerCase().contains(city)) {
-				rezZone=ZoneId.of(zone);
-				System.out.println("33333  "+ztd.withZoneSameInstant(rezZone));
-			}
+		
+		
+		if (args.length > 0 && args[0].contains("-h")) {
+			printHelp();
+			return;
+		}
+		try {
+			getZones(args);
+			printResults();
+		} catch (RuntimeException ex) {
+			ex.printStackTrace();				//functionality error
+		} catch(Exception ex) {
+			System.out.println(ex.toString());  //wrong input data 
 		}
 	}
-	
-	return rezZone;
-}
 
-
-private static String getCity(String string)  throws Exception {
-	String res ="toronto";
-	try {
-		res = string.toLowerCase();
-	} catch (NumberFormatException e) {
-		throw new Exception("City should be a string");}
-	
-	if (res == null) {
-		throw new Exception("City can't be blanced");
+	private static void printHelp() {
+		System.out.println("Select one on following zones. Default value is Local Zone");
+		for (String zone : ZoneId.getAvailableZoneIds()) {
+			System.out.println(zone);
+		}
 	}
-	return res;
-}
+
+	private static void printResults() {
+		//DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm:ss VV");
+		Iterator<ZonedDateTime> itr = timeZones.iterator();
+		while(itr.hasNext()) {
+			//System.out.printf("The time for selected Zone is: %s  \n", itr.next().format(format));
+			System.out.println(itr.next());
+		}
+	}
+
+	private static void getZones(String[] args) throws Exception {
+		if(args.length>0) {
+			for (String zone : ZoneId.getAvailableZoneIds()) {
+				if (zone.toLowerCase().contains(args[0].toLowerCase())) { 
+					timeZones.add(ZonedDateTime.now(ZoneId.of(zone)));
+				}
+			}
+			if(timeZones.size()==0) {
+				throw new Exception("zone="+args[0]+" isn't found");
+			}
+		} else {
+			timeZones.add(ZonedDateTime.now());
+		}
+
+	
+	}
+		
 }
